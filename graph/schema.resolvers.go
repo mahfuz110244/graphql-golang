@@ -24,8 +24,34 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
+func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
+	randomInt, _ := rand.Int(rand.Reader, big.NewInt(1000000))
+	fmt.Println(randomInt)
+	book := &model.Book{
+		ID:     fmt.Sprintf("B%d", randomInt),
+		Title:  input.Title,
+		Price:  input.Price,
+		IsbnNo: input.IsbnNo,
+		Authors: &model.Author{
+			ID:        input.AuthorID,
+			Name:      "author " + input.AuthorID,
+			Biography: "biography " + input.AuthorID,
+		},
+	}
+	r.books = append(r.books, book)
+	return book, nil
+}
+
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
+}
+
+func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
+	return r.books, nil
+}
+
+func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
+	return r.authors, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

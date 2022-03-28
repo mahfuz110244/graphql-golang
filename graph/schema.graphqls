@@ -14,26 +14,12 @@ type User {
   name: String!
 }
 
-type Query {
-  todos: [Todo!]!
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
-}
-
-
 type Book {
   id: ID!
   title: String!
-  price: INT!
+  price: Int!
   isbn_no: String!
-  author: Author!
+  authors: Author!
 }
 
 type Author {
@@ -43,17 +29,26 @@ type Author {
 }
 
 type Query {
+  todos: [Todo!]!
   books: [Book!]!
+  authors: [Author!]!
+  authorsBook(name : String!): [Book!]!
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
 }
 
 input NewBook {
   title: String!
-  price: INT!
+  price: Int!
   isbn_no: String!
   authorId: String!
 }
 
 type Mutation {
+  createTodo(input: NewTodo!): Todo!
   createBook(input: NewBook!): Book!
 }
 

@@ -2,6 +2,27 @@
 
 package model
 
+type Author struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Biography string `json:"biography"`
+}
+
+type Book struct {
+	ID      string  `json:"id"`
+	Title   string  `json:"title"`
+	Price   int     `json:"price"`
+	IsbnNo  string  `json:"isbn_no"`
+	Authors *Author `json:"authors"`
+}
+
+type NewBook struct {
+	Title    string `json:"title"`
+	Price    int    `json:"price"`
+	IsbnNo   string `json:"isbn_no"`
+	AuthorID string `json:"authorId"`
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
