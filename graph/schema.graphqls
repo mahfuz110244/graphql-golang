@@ -22,6 +22,10 @@ type Book {
   authors: Author!
 }
 
+type Books {
+  books: [Book]
+}
+
 type Author {
   id: ID!
   name: String!
@@ -31,7 +35,7 @@ type Author {
 type Query {
   todos: [Todo!]!
   books: [Book!]!
-  authors(name : String!): [Book!]!
+  authors(name : String!): Books!
 }
 
 input NewTodo {
