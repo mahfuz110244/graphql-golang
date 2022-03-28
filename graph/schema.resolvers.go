@@ -50,8 +50,14 @@ func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 	return r.books, nil
 }
 
-func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
-	return r.authors, nil
+func (r *queryResolver) Authors(ctx context.Context, name string) ([]*model.Book, error) {
+	var books []*model.Book
+	for _, book := range r.books {
+		if book.Authors.Name == name {
+			books = append(books, book)
+		}
+	}
+	return books, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
