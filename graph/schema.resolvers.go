@@ -12,18 +12,6 @@ import (
 	"math/big"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	randomInt, _ := rand.Int(rand.Reader, big.NewInt(1000000))
-	fmt.Println(randomInt)
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", randomInt),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
-	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
-}
-
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
 	randomInt, _ := rand.Int(rand.Reader, big.NewInt(1000000))
 	// fmt.Println(randomInt)
@@ -40,10 +28,6 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 	}
 	r.books = append(r.books, book)
 	return book, nil
-}
-
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
 }
 
 func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
