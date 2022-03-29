@@ -32,6 +32,13 @@ type Author {
   biography: String!
 }
 
+input NewAuthor {
+  id: ID!
+  name: String!
+  biography: String!
+}
+
+
 type Query {
   todos: [Todo!]!
   books: [Book!]!
@@ -47,7 +54,7 @@ input NewBook {
   title: String!
   price: Int!
   isbn_no: String!
-  authorId: String!
+  author: NewAuthor!
 }
 
 type Mutation {

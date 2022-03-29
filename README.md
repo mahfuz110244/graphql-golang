@@ -1,5 +1,11 @@
 # graphql-golang
 
+## Generate 
+```
+go run github.com/99designs/gqlgen generate
+```
+
+## Playground
 ```
 mutation createTodo {
   createTodo(input: {text: "todo", userId: "2"}) {
@@ -23,7 +29,12 @@ query findTodos {
 
 mutation createBook {
   createBook(
-    input: {title: "Book1", authorId: "1", price: 1000, isbn_no: "BK676757575869"}
+    input: {title: "Book5", price: 1000, isbn_no: "BK676757575869", author: {
+      id: "2",
+      name: "John",
+      biography: "very good writer"
+    }
+  }
   ) {
     id
     title
@@ -52,7 +63,7 @@ query GetAllBooksWithAuthors {
 }
 
 query GetAllTheBooksOfAuthor1 {
-authors(name: "author 1") {
+authors(name: "author1") {
     books {
       id
       title

@@ -20,11 +20,17 @@ type Books struct {
 	Books []*Book `json:"books"`
 }
 
+type NewAuthor struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Biography string `json:"biography"`
+}
+
 type NewBook struct {
-	Title    string `json:"title"`
-	Price    int    `json:"price"`
-	IsbnNo   string `json:"isbn_no"`
-	AuthorID string `json:"authorId"`
+	Title  string     `json:"title"`
+	Price  int        `json:"price"`
+	IsbnNo string     `json:"isbn_no"`
+	Author *NewAuthor `json:"author"`
 }
 
 type NewTodo struct {

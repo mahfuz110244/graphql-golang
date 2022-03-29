@@ -26,16 +26,16 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
 	randomInt, _ := rand.Int(rand.Reader, big.NewInt(1000000))
-	fmt.Println(randomInt)
+	// fmt.Println(randomInt)
 	book := &model.Book{
 		ID:     fmt.Sprintf("B%d", randomInt),
 		Title:  input.Title,
 		Price:  input.Price,
 		IsbnNo: input.IsbnNo,
 		Authors: &model.Author{
-			ID:        input.AuthorID,
-			Name:      "author " + input.AuthorID,
-			Biography: "biography " + input.AuthorID,
+			ID:        input.Author.ID,
+			Name:      input.Author.Name,
+			Biography: input.Author.Biography,
 		},
 	}
 	r.books = append(r.books, book)

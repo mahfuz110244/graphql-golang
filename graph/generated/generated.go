@@ -363,6 +363,13 @@ type Author {
   biography: String!
 }
 
+input NewAuthor {
+  id: ID!
+  name: String!
+  biography: String!
+}
+
+
 type Query {
   todos: [Todo!]!
   books: [Book!]!
@@ -378,7 +385,7 @@ input NewBook {
   title: String!
   price: Int!
   isbn_no: String!
-  authorId: String!
+  author: NewAuthor!
 }
 
 type Mutation {
@@ -2467,6 +2474,45 @@ func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field gr
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputNewAuthor(ctx context.Context, obj interface{}) (model.NewAuthor, error) {
+	var it model.NewAuthor
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "biography":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("biography"))
+			it.Biography, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewBook(ctx context.Context, obj interface{}) (model.NewBook, error) {
 	var it model.NewBook
 	asMap := map[string]interface{}{}
@@ -2500,11 +2546,11 @@ func (ec *executionContext) unmarshalInputNewBook(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "authorId":
+		case "author":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorId"))
-			it.AuthorID, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
+			it.Author, err = ec.unmarshalNNewAuthor2ᚖgraphqlᚑgolangᚋgraphᚋmodelᚐNewAuthor(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3516,6 +3562,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNNewAuthor2ᚖgraphqlᚑgolangᚋgraphᚋmodelᚐNewAuthor(ctx context.Context, v interface{}) (*model.NewAuthor, error) {
+	res, err := ec.unmarshalInputNewAuthor(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewBook2graphqlᚑgolangᚋgraphᚋmodelᚐNewBook(ctx context.Context, v interface{}) (model.NewBook, error) {
