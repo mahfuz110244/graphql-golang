@@ -3,12 +3,12 @@ package repository
 import (
 	"log"
 
-	"github.com/mahfuz110244/golang-assignment/graph/model"
-	db "github.com/mahfuz110244/golang-assignment/internal/pkg/db/mysql"
+	db "graphql-golang/internal/pkg/db/mysql"
+	"graphql-golang/schema"
 )
 
 //CreateAuthor create's author
-func CreateAuthor(author model.Author) (int64, error) {
+func CreateAuthor(author schema.Author) (int64, error) {
 
 	stmt, err := db.Db.Prepare("INSERT INTO Authors(Name,Biography) VALUES(?,?)")
 	if err != nil {
@@ -34,7 +34,7 @@ func CreateAuthor(author model.Author) (int64, error) {
 }
 
 //CreateBook creates new book
-func CreateBook(book model.Book) (int64, error) {
+func CreateBook(book schema.Book) (int64, error) {
 	stmt, err := db.Db.Prepare("insert into Books(Title,Price,IsbnNo,AuthorID) VALUES(?,?,?,?)")
 	if err != nil {
 		return 0, err
@@ -54,7 +54,7 @@ func CreateBook(book model.Book) (int64, error) {
 }
 
 //GetBooksByID returns books by respective id
-func GetBooksByID(id *string) (*model.Book, error) {
+func GetBooksByID(id *string) (*schema.Book, error) {
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID and Books.ID = ? ;")
 	if err != nil {
 		return nil, err
@@ -70,12 +70,12 @@ func GetBooksByID(id *string) (*model.Book, error) {
 		}
 	}
 
-	book := &model.Book{
+	book := &schema.Book{
 		ID:     bookID,
 		Title:  title,
 		Price:  price,
 		IsbnNo: isbn_no,
-		Authors: &model.Author{
+		Authors: &schema.Author{
 			ID:        authorID,
 			Name:      name,
 			Biography: biography,
@@ -87,8 +87,8 @@ func GetBooksByID(id *string) (*model.Book, error) {
 }
 
 //GetAllBooks returns all Books Data
-func GetAllBooks() ([]*model.Book, error) {
-	var books []*model.Book
+func GetAllBooks() ([]*schema.Book, error) {
+	var books []*schema.Book
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
@@ -107,12 +107,12 @@ func GetAllBooks() ([]*model.Book, error) {
 			return nil, err
 		}
 
-		book := &model.Book{
+		book := &schema.Book{
 			ID:     bookID,
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Authors: &model.Author{
+			Authors: &schema.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,
@@ -125,8 +125,8 @@ func GetAllBooks() ([]*model.Book, error) {
 }
 
 //GetAllBooks returns all Books Data
-func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
-	var books []*model.Book
+func GetAllBooksByAuthorName(name string) ([]*schema.Book, error) {
+	var books []*schema.Book
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Authors.Name = ? and Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
@@ -145,12 +145,12 @@ func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
 			return nil, err
 		}
 
-		book := &model.Book{
+		book := &schema.Book{
 			ID:     bookID,
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Authors: &model.Author{
+			Authors: &schema.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,

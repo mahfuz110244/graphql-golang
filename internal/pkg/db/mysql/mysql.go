@@ -30,6 +30,7 @@ func Migrate() {
 	if err := Db.Ping(); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Ping DB Successfully")
 	driver, _ := mysql.WithInstance(Db, &mysql.Config{})
 	m, _ := migrate.NewWithDatabaseInstance(
 		"file://internal/pkg/db/migrations/mysql",

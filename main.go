@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	db "graphql-golang/internal/pkg/db/mysql"
 	"graphql-golang/schema"
 
 	"github.com/graphql-go/graphql"
@@ -22,6 +23,9 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 }
 
 func main() {
+	db.InitDB()
+	db.Migrate()
+
 	http.HandleFunc("/product", func(w http.ResponseWriter, r *http.Request) {
 		result := executeQuery(r.URL.Query().Get("query"), schema.Productchema)
 		json.NewEncoder(w).Encode(result)
