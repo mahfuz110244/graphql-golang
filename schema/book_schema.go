@@ -26,25 +26,8 @@ var bookType = graphql.NewObject(
 			"isbn_no": &graphql.Field{
 				Type: graphql.String,
 			},
-			// "author": &graphql.Field{
-			// 	Type: graphql.String,
-			// },
-			// "author": &graphql.Field{
-			// 	Type: graphql.NewList(authorType),
-			// },
 			"author": &graphql.Field{
 				Type: authorType,
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.Int,
-					},
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					"biography": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-				},
 			},
 		},
 	},
@@ -64,32 +47,6 @@ var queryTypeBook = graphql.NewObject(
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.Int,
 					},
-					// "title": &graphql.ArgumentConfig{
-					// 	Type: graphql.String,
-					// },
-					// "price": &graphql.ArgumentConfig{
-					// 	Type: graphql.Float,
-					// },
-					// "isbn_no": &graphql.ArgumentConfig{
-					// 	Type: graphql.String,
-					// },
-					// "author": &graphql.ArgumentConfig{
-					// 	Type: graphql.NewList(authorType),
-					// },
-					// "author": &graphql.ArgumentConfig{
-					// 	Type: authorType,
-					// 	// Args: graphql.FieldConfigArgument{
-					// 	// 	"id": &graphql.ArgumentConfig{
-					// 	// 		Type: graphql.Int,
-					// 	// 	},
-					// 	// 	"name": &graphql.ArgumentConfig{
-					// 	// 		Type: graphql.String,
-					// 	// 	},
-					// 	// 	"biography": &graphql.ArgumentConfig{
-					// 	// 		Type: graphql.String,
-					// 	// 	},
-					// 	// },
-					// },
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					id := p.Args["id"].(int)
@@ -108,7 +65,7 @@ var queryTypeBook = graphql.NewObject(
 			/* Get (read) book list
 			   http://localhost:8080/book?query={list{id,title,price,isbn_no,author{id,name,biography}}
 			*/
-			"list": &graphql.Field{
+			"books": &graphql.Field{
 				Type:        graphql.NewList(bookType),
 				Description: "Get book list",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
@@ -117,6 +74,31 @@ var queryTypeBook = graphql.NewObject(
 						return nil, err
 					} else {
 						return books, err
+					}
+				},
+			},
+
+			/* Get (read) book list for authors
+			   http://localhost:8080/authors?query={authors(name:"John"){list{id,title,price,isbn_no,author{id,name,biography}}
+			*/
+			"authors": &graphql.Field{
+				Type:        graphql.NewList(bookType),
+				Description: "Get book list for authors",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name := params.Args["name"].(string)
+					books, err := repository.GetAllBooksByAuthorName(name)
+					if err != nil {
+						return nil, err
+					} else {
+						// booksData := &model.Books{
+						// 	Books: books,
+						// }
+						return books, nil
 					}
 				},
 			},
@@ -145,20 +127,6 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 				"author": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				// "author": &graphql.ArgumentConfig{
-				// 	Type: graphql.String,
-				// 	// Args: graphql.FieldConfigArgument{
-				// 	// 	"id": &graphql.ArgumentConfig{
-				// 	// 		Type: graphql.Int,
-				// 	// 	},
-				// 	// 	"name": &graphql.ArgumentConfig{
-				// 	// 		Type: graphql.String,
-				// 	// 	},
-				// 	// 	"biography": &graphql.ArgumentConfig{
-				// 	// 		Type: graphql.String,
-				// 	// 	},
-				// 	// },
-				// },
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				var book model.Book
@@ -176,13 +144,12 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 				}
 				idStr := strconv.Itoa(int(id))
 				createdBook, _ := repository.GetBooksByID(&idStr)
+				// return &model.Book{ID: createdBook.ID, Title: createdBook.Title, IsbnNo: createdBook.IsbnNo, Price: createdBook.Price, Authors: &model.Author{
+				// 	ID:        createdBook.Authors.ID,
+				// 	Name:      createdBook.Authors.Name,
+				// 	Biography: createdBook.Authors.Biography,
+				// }}, nil
 				return createdBook, nil
-				// id, err := repository.CreateBook(book)
-				// if err != nil {
-				// 	return nil, err
-				// } else {
-				// 	return &model.Book{ID: strconv.FormatInt(id, 10), Title: book.Title, IsbnNo: book.IsbnNo, Price: book.Price, Authors: book.Authors}, nil
-				// }
 			},
 		},
 	},
