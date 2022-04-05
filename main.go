@@ -38,6 +38,11 @@ func main() {
 		json.NewEncoder(w).Encode(result)
 	})
 
+	http.HandleFunc("/book", func(w http.ResponseWriter, r *http.Request) {
+		result := executeQuery(r.URL.Query().Get("query"), schema.BookSchema)
+		json.NewEncoder(w).Encode(result)
+	})
+
 	fmt.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
