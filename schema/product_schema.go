@@ -203,7 +203,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var Productchema, _ = graphql.NewSchema(
+var ProductSchema, _ = graphql.NewSchema(
 	graphql.SchemaConfig{
 		Query:    queryType,
 		Mutation: mutationType,

@@ -8,6 +8,8 @@ import (
 	db "graphql-golang/internal/pkg/db/mysql"
 	"graphql-golang/schema"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/golang-migrate/migrate/source/file"
 	"github.com/graphql-go/graphql"
 )
 
@@ -27,7 +29,12 @@ func main() {
 	db.Migrate()
 
 	http.HandleFunc("/product", func(w http.ResponseWriter, r *http.Request) {
-		result := executeQuery(r.URL.Query().Get("query"), schema.Productchema)
+		result := executeQuery(r.URL.Query().Get("query"), schema.ProductSchema)
+		json.NewEncoder(w).Encode(result)
+	})
+
+	http.HandleFunc("/author", func(w http.ResponseWriter, r *http.Request) {
+		result := executeQuery(r.URL.Query().Get("query"), schema.AuthorSchema)
 		json.NewEncoder(w).Encode(result)
 	})
 

@@ -4,11 +4,11 @@ import (
 	"log"
 
 	db "graphql-golang/internal/pkg/db/mysql"
-	"graphql-golang/schema"
+	"graphql-golang/model"
 )
 
 //CreateAuthor create's author
-func CreateAuthor(author schema.Author) (int64, error) {
+func CreateAuthor(author model.Author) (int64, error) {
 
 	stmt, err := db.Db.Prepare("INSERT INTO Authors(Name,Biography) VALUES(?,?)")
 	if err != nil {
@@ -34,7 +34,7 @@ func CreateAuthor(author schema.Author) (int64, error) {
 }
 
 //CreateBook creates new book
-func CreateBook(book schema.Book) (int64, error) {
+func CreateBook(book model.Book) (int64, error) {
 	stmt, err := db.Db.Prepare("insert into Books(Title,Price,IsbnNo,AuthorID) VALUES(?,?,?,?)")
 	if err != nil {
 		return 0, err
@@ -54,7 +54,7 @@ func CreateBook(book schema.Book) (int64, error) {
 }
 
 //GetBooksByID returns books by respective id
-func GetBooksByID(id *string) (*schema.Book, error) {
+func GetBooksByID(id *string) (*model.Book, error) {
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID and Books.ID = ? ;")
 	if err != nil {
 		return nil, err
@@ -70,12 +70,12 @@ func GetBooksByID(id *string) (*schema.Book, error) {
 		}
 	}
 
-	book := &schema.Book{
+	book := &model.Book{
 		ID:     bookID,
 		Title:  title,
 		Price:  price,
 		IsbnNo: isbn_no,
-		Authors: &schema.Author{
+		Authors: &model.Author{
 			ID:        authorID,
 			Name:      name,
 			Biography: biography,
@@ -87,8 +87,8 @@ func GetBooksByID(id *string) (*schema.Book, error) {
 }
 
 //GetAllBooks returns all Books Data
-func GetAllBooks() ([]*schema.Book, error) {
-	var books []*schema.Book
+func GetAllBooks() ([]*model.Book, error) {
+	var books []*model.Book
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
@@ -107,12 +107,12 @@ func GetAllBooks() ([]*schema.Book, error) {
 			return nil, err
 		}
 
-		book := &schema.Book{
+		book := &model.Book{
 			ID:     bookID,
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Authors: &schema.Author{
+			Authors: &model.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,
@@ -125,8 +125,8 @@ func GetAllBooks() ([]*schema.Book, error) {
 }
 
 //GetAllBooks returns all Books Data
-func GetAllBooksByAuthorName(name string) ([]*schema.Book, error) {
-	var books []*schema.Book
+func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
+	var books []*model.Book
 	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Authors.Name = ? and Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
@@ -145,12 +145,12 @@ func GetAllBooksByAuthorName(name string) ([]*schema.Book, error) {
 			return nil, err
 		}
 
-		book := &schema.Book{
+		book := &model.Book{
 			ID:     bookID,
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Authors: &schema.Author{
+			Authors: &model.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,
@@ -160,4 +160,68 @@ func GetAllBooksByAuthorName(name string) ([]*schema.Book, error) {
 	}
 
 	return books, nil
+}
+
+//GetAuthorByID return author with respective id
+func GetAuthorByID(id *string) (*model.Author, error) {
+	stmt, err := db.Db.Prepare("select * from Authors where id=?")
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	defer stmt.Close()
+	rows, err := stmt.Query(id)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	defer rows.Close()
+	var author model.Author
+	for rows.Next() {
+		err = rows.Scan(&author.ID, &author.Name, &author.Biography)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	defer rows.Close()
+
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return &author, nil
+
+}
+
+//GetAllAuthors returns all authors
+func GetAllAuthors() ([]*model.Author, error) {
+	stmt, err := db.Db.Prepare("select * from Authors")
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+
+	var authors []*model.Author
+	for rows.Next() {
+		var author model.Author
+		rows.Scan(&author.ID, &author.Name, &author.Biography)
+		authors = append(authors, &author)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	defer stmt.Close()
+	defer rows.Close()
+
+	return authors, err
 }
