@@ -1,13 +1,29 @@
 package schema
 
 import (
-	"fmt"
 	"graphql-golang/repository"
 	"strconv"
 
 	"graphql-golang/model"
 
 	"github.com/graphql-go/graphql"
+)
+
+var authorType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Author",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+			"biography": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
 )
 
 var bookType = graphql.NewObject(
@@ -29,7 +45,7 @@ var bookType = graphql.NewObject(
 			"author_id": &graphql.Field{
 				Type: graphql.String,
 			},
-			"author": &graphql.Field{
+			"authors": &graphql.Field{
 				Type: authorType,
 			},
 		},
@@ -48,10 +64,48 @@ var booksType = graphql.NewObject(
 	},
 )
 
-var queryTypeBook = graphql.NewObject(
+var queryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
+			/* Get (read) single author by id
+			   http://localhost:8080/author?query={author(id:1){name,biography}}
+			*/
+			"author": &graphql.Field{
+				Type:        authorType,
+				Description: "Get author by id",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.Int,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					id := p.Args["id"].(int)
+					idStr := strconv.Itoa(id)
+					author, err := repository.GetAuthorByID(&idStr)
+					if err != nil {
+						return nil, err
+					} else {
+						return author, nil
+					}
+				},
+			},
+			/* Get (read) author list
+			   http://localhost:8080/author_list?query={list{id,name,biography}}
+			*/
+			"author_list": &graphql.Field{
+				Type:        graphql.NewList(authorType),
+				Description: "Get author list",
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					authors, err := repository.GetAllAuthors()
+					if err != nil {
+						return nil, err
+					} else {
+						return authors, err
+					}
+				},
+			},
+
 			/* Get (read) single book by id
 			   http://localhost:8080/book?query={book(id:1){id,title,price,isbn_no,author{name,biography}}}
 			*/
@@ -118,11 +172,38 @@ var queryTypeBook = graphql.NewObject(
 		},
 	})
 
-var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
+var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
 	Fields: graphql.Fields{
+		/* Create new author item
+		http://localhost:8080/author?query=mutation+_{createAuthor(name:"John",biography:"Inca Kola is a soft drink that was created in Peru in 1935 by British immigrant Joseph Robinson Lindley using lemon verbena (wiki)"){id,name,biography}}
+		*/
+		"createAuthor": &graphql.Field{
+			Type:        authorType,
+			Description: "Create new author",
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+				"biography": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				var author model.Author
+				author.Name = params.Args["name"].(string)
+				author.Biography = params.Args["biography"].(string)
+				id, err := repository.CreateAuthor(author)
+				if err != nil {
+					return nil, err
+				} else {
+					return &model.Author{ID: strconv.FormatInt(id, 10), Name: author.Name, Biography: author.Biography}, nil
+				}
+			},
+		},
+
 		/* Create new book item
-		http://localhost:8080/book?query=mutation+_{create(title:"Book 1",price:1000,isbn_no:"6678557878798",author:"1"){id,title,price,isbn_no,author{id,name,biography}}}
+		http://localhost:8080/book?query=mutation+_{createBook(title:"Book 1",price:1000,isbn_no:"6678557878798",author_id:"1"){id,title,price,isbn_no,author{id,name,biography}}}
 		*/
 		"createBook": &graphql.Field{
 			Type:        bookType,
@@ -137,7 +218,7 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 				"isbn_no": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				"author": &graphql.ArgumentConfig{
+				"author_id": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
 			},
@@ -146,10 +227,7 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 				book.Title = params.Args["title"].(string)
 				book.IsbnNo = params.Args["isbn_no"].(string)
 				book.Price = params.Args["price"].(float64)
-				authorID := params.Args["author"].(string)
-
-				fmt.Println(authorID)
-				// authorIDStr := strconv.Itoa(authorID)
+				authorID := params.Args["author_id"].(string)
 				book.Authors = &model.Author{
 					ID: authorID,
 				}
@@ -170,9 +248,9 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var BookSchema, _ = graphql.NewSchema(
+var Schema, _ = graphql.NewSchema(
 	graphql.SchemaConfig{
-		Query:    queryTypeBook,
-		Mutation: mutationTypeBook,
+		Query:    queryType,
+		Mutation: mutationType,
 	},
 )

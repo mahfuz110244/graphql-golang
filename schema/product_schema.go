@@ -56,7 +56,7 @@ var productType = graphql.NewObject(
 	},
 )
 
-var queryType = graphql.NewObject(
+var queryTypeProduct = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
@@ -97,7 +97,7 @@ var queryType = graphql.NewObject(
 		},
 	})
 
-var mutationType = graphql.NewObject(graphql.ObjectConfig{
+var mutationTypeProduct = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
 	Fields: graphql.Fields{
 		/* Create new product item
@@ -205,7 +205,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 
 var ProductSchema, _ = graphql.NewSchema(
 	graphql.SchemaConfig{
-		Query:    queryType,
-		Mutation: mutationType,
+		Query:    queryTypeProduct,
+		Mutation: mutationTypeProduct,
 	},
 )

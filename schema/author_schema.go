@@ -9,22 +9,6 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-var authorType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "Author",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"biography": &graphql.Field{
-				Type: graphql.String,
-			},
-		},
-	},
-)
 
 var queryTypeAuthor = graphql.NewObject(
 	graphql.ObjectConfig{

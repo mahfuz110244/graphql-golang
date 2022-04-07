@@ -11,6 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/golang-migrate/migrate/source/file"
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 )
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
@@ -38,25 +39,24 @@ func main() {
 		json.NewEncoder(w).Encode(result)
 	})
 
-	http.HandleFunc("/book", func(w http.ResponseWriter, r *http.Request) {
-		result := executeQuery(r.URL.Query().Get("query"), schema.BookSchema)
-		json.NewEncoder(w).Encode(result)
-	})
+	// http.HandleFunc("/book", func(w http.ResponseWriter, r *http.Request) {
+	// 	result := executeQuery(r.URL.Query().Get("query"), schema.BookSchema)
+	// 	json.NewEncoder(w).Encode(result)
+	// })
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 	// h1 := handler.New(&handler.Config{
 	// 	Schema:   &schema.BookSchema,
 	// 	Pretty:   true,
 	// 	GraphiQL: true,
 	// })
 
-	// h := handler.New(&handler.Config{
-	// 	Schema:   &schema.BookSchema,
-	// 	Pretty:   true,
-	// 	GraphiQL: true,
-	// })
+	h := handler.New(&handler.Config{
+		Schema:   &schema.Schema,
+		Pretty:   true,
+		GraphiQL: true,
+	})
 
-	// http.Handle("/graphql", h)
-	// http.Handle("/graphiql", h1)
-	// http.ListenAndServe(":8080", nil)
+	http.Handle("/graphql", h)
+	http.ListenAndServe(":8080", nil)
 }
