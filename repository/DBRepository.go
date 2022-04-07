@@ -74,10 +74,11 @@ func GetBooksByID(id *string) (*model.Book, error) {
 		return nil, fmt.Errorf("Book not found")
 	}
 	book := &model.Book{
-		ID:     bookID,
-		Title:  title,
-		Price:  price,
-		IsbnNo: isbn_no,
+		ID:       bookID,
+		Title:    title,
+		Price:    price,
+		IsbnNo:   isbn_no,
+		AuthorID: authorID,
 		Authors: &model.Author{
 			ID:        authorID,
 			Name:      name,
@@ -86,9 +87,9 @@ func GetBooksByID(id *string) (*model.Book, error) {
 	}
 	defer rows.Close()
 	defer stmt.Close()
-	fmt.Println(book.Authors.ID)
-	fmt.Println(book.Authors.Name)
-	fmt.Println(book.Authors.Biography)
+	// fmt.Println(book.Authors.ID)
+	// fmt.Println(book.Authors.Name)
+	// fmt.Println(book.Authors.Biography)
 	return book, nil
 }
 
@@ -114,10 +115,11 @@ func GetAllBooks() ([]*model.Book, error) {
 		}
 
 		book := &model.Book{
-			ID:     bookID,
-			Title:  title,
-			Price:  price,
-			IsbnNo: isbn_no,
+			ID:       bookID,
+			Title:    title,
+			Price:    price,
+			IsbnNo:   isbn_no,
+			AuthorID: authorID,
 			Authors: &model.Author{
 				ID:        authorID,
 				Name:      name,
@@ -125,11 +127,11 @@ func GetAllBooks() ([]*model.Book, error) {
 			},
 		}
 		books = append(books, book)
-		fmt.Println(book.Authors.ID)
-		fmt.Println(book.Authors.Name)
-		fmt.Println(book.Authors.Biography)
+		// fmt.Println(book.Authors.ID)
+		// fmt.Println(book.Authors.Name)
+		// fmt.Println(book.Authors.Biography)
 	}
-	fmt.Println(books)
+	// fmt.Println(books)
 	return books, nil
 }
 

@@ -76,7 +76,7 @@ var mutationTypeAuthor = graphql.NewObject(graphql.ObjectConfig{
 		/* Create new author item
 		http://localhost:8080/author?query=mutation+_{create(name:"John",biography:"Inca Kola is a soft drink that was created in Peru in 1935 by British immigrant Joseph Robinson Lindley using lemon verbena (wiki)"){id,name,biography}}
 		*/
-		"create": &graphql.Field{
+		"createAuthor": &graphql.Field{
 			Type:        authorType,
 			Description: "Create new author",
 			Args: graphql.FieldConfigArgument{

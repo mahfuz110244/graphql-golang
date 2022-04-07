@@ -43,6 +43,20 @@ func main() {
 		json.NewEncoder(w).Encode(result)
 	})
 
-	fmt.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", nil)
+	// h1 := handler.New(&handler.Config{
+	// 	Schema:   &schema.BookSchema,
+	// 	Pretty:   true,
+	// 	GraphiQL: true,
+	// })
+
+	// h := handler.New(&handler.Config{
+	// 	Schema:   &schema.BookSchema,
+	// 	Pretty:   true,
+	// 	GraphiQL: true,
+	// })
+
+	// http.Handle("/graphql", h)
+	// http.Handle("/graphiql", h1)
+	// http.ListenAndServe(":8080", nil)
 }

@@ -26,8 +26,23 @@ var bookType = graphql.NewObject(
 			"isbn_no": &graphql.Field{
 				Type: graphql.String,
 			},
+			"author_id": &graphql.Field{
+				Type: graphql.String,
+			},
 			"author": &graphql.Field{
 				Type: authorType,
+			},
+		},
+	},
+)
+
+var booksType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Books",
+		Fields: graphql.Fields{
+			"books": &graphql.Field{
+				Type:        graphql.NewList(bookType),
+				Description: "Get book list",
 			},
 		},
 	},
@@ -52,9 +67,6 @@ var queryTypeBook = graphql.NewObject(
 					id := p.Args["id"].(int)
 					idStr := strconv.Itoa(id)
 					book, err := repository.GetBooksByID(&idStr)
-					fmt.Println(book.Authors.ID)
-					fmt.Println(book.Authors.Name)
-					fmt.Println(book.Authors.Biography)
 					if err != nil {
 						return nil, err
 					} else {
@@ -79,10 +91,10 @@ var queryTypeBook = graphql.NewObject(
 			},
 
 			/* Get (read) book list for authors
-			   http://localhost:8080/authors?query={authors(name:"John"){list{id,title,price,isbn_no,author{id,name,biography}}
+			   http://localhost:8080/authors?query={authors(name:"John"){books{id,title,price,isbn_no,author{id,name,biography}}
 			*/
 			"authors": &graphql.Field{
-				Type:        graphql.NewList(bookType),
+				Type:        booksType,
 				Description: "Get book list for authors",
 				Args: graphql.FieldConfigArgument{
 					"name": &graphql.ArgumentConfig{
@@ -95,10 +107,11 @@ var queryTypeBook = graphql.NewObject(
 					if err != nil {
 						return nil, err
 					} else {
-						// booksData := &model.Books{
-						// 	Books: books,
-						// }
-						return books, nil
+						booksData := &model.Books{
+							Books: books,
+						}
+						return booksData, err
+						// return books, nil
 					}
 				},
 			},
@@ -111,7 +124,7 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 		/* Create new book item
 		http://localhost:8080/book?query=mutation+_{create(title:"Book 1",price:1000,isbn_no:"6678557878798",author:"1"){id,title,price,isbn_no,author{id,name,biography}}}
 		*/
-		"create": &graphql.Field{
+		"createBook": &graphql.Field{
 			Type:        bookType,
 			Description: "Create new book",
 			Args: graphql.FieldConfigArgument{
@@ -125,7 +138,7 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 				"author": &graphql.ArgumentConfig{
-					Type: graphql.String,
+					Type: graphql.NewNonNull(graphql.String),
 				},
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
@@ -134,6 +147,8 @@ var mutationTypeBook = graphql.NewObject(graphql.ObjectConfig{
 				book.IsbnNo = params.Args["isbn_no"].(string)
 				book.Price = params.Args["price"].(float64)
 				authorID := params.Args["author"].(string)
+
+				fmt.Println(authorID)
 				// authorIDStr := strconv.Itoa(authorID)
 				book.Authors = &model.Author{
 					ID: authorID,
