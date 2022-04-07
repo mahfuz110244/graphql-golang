@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	db "graphql-golang/internal/pkg/db/mysql"
@@ -25,7 +26,10 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	return result
 }
 
+const defaultPort = "8080"
+
 func main() {
+	port := defaultPort
 	db.InitDB()
 	db.Migrate()
 
@@ -39,24 +43,17 @@ func main() {
 		json.NewEncoder(w).Encode(result)
 	})
 
-	// http.HandleFunc("/book", func(w http.ResponseWriter, r *http.Request) {
-	// 	result := executeQuery(r.URL.Query().Get("query"), schema.BookSchema)
-	// 	json.NewEncoder(w).Encode(result)
-	// })
-
-	// http.ListenAndServe(":8080", nil)
-	// h1 := handler.New(&handler.Config{
-	// 	Schema:   &schema.BookSchema,
-	// 	Pretty:   true,
-	// 	GraphiQL: true,
-	// })
+	http.HandleFunc("/book", func(w http.ResponseWriter, r *http.Request) {
+		result := executeQuery(r.URL.Query().Get("query"), schema.Schema)
+		json.NewEncoder(w).Encode(result)
+	})
 
 	h := handler.New(&handler.Config{
 		Schema:   &schema.Schema,
 		Pretty:   true,
 		GraphiQL: true,
 	})
-
 	http.Handle("/graphql", h)
-	http.ListenAndServe(":8080", nil)
+	log.Printf("connect to http://localhost:%s/graphql for GraphQL playground", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

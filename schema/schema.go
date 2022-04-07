@@ -42,9 +42,6 @@ var bookType = graphql.NewObject(
 			"isbn_no": &graphql.Field{
 				Type: graphql.String,
 			},
-			"author_id": &graphql.Field{
-				Type: graphql.String,
-			},
 			"authors": &graphql.Field{
 				Type: authorType,
 			},
